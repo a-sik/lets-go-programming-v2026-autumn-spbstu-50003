@@ -9,6 +9,25 @@ const (
 	lowBord  = 15
 )
 
+type Range struct {
+	Min int
+	Max int
+}
+
+func (tempRange *Range) Update(sign string, temp int) int {
+	if sign == ">=" && temp > tempRange.Min {
+		tempRange.Min = temp
+	} else if sign == "<=" && temp < tempRange.Max {
+		tempRange.Max = temp
+	}
+
+	if tempRange.Min > tempRange.Max {
+		return -1
+	}
+
+	return tempRange.Min
+}
+
 func main() {
 	var departments, employees int
 	if _, err := fmt.Scan(&departments); err != nil || departments < 1 || departments > 1000 {
@@ -24,7 +43,7 @@ func main() {
 			return
 		}
 
-		low, high := lowBord, highBord
+		tempRng := Range{Min: lowBord, Max: highBord}
 
 		for range employees {
 			var (
@@ -32,32 +51,13 @@ func main() {
 				temp int
 			)
 
-			if _, err := fmt.Scan(&sign, &temp); err != nil {
-				fmt.Println("Invalid temperature value")
+			if _, err := fmt.Scan(&sign, &temp); err != nil || (sign != ">=" && sign != "<=") {
+				fmt.Println("Invalid sign or temperature value")
 
 				return
 			}
 
-			switch sign {
-			case ">=":
-				if temp > low {
-					low = temp
-				}
-			case "<=":
-				if temp < high {
-					high = temp
-				}
-			default:
-				fmt.Println("Invalid sign")
-
-				return
-			}
-
-			if low > high {
-				fmt.Println("-1")
-			} else {
-				fmt.Println(low)
-			}
+			fmt.Println(tempRng.Update(sign, temp))
 		}
 	}
 }
